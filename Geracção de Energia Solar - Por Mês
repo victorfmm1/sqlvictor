@@ -1,0 +1,20 @@
+select
+    (select geracao from fvt_geracao_mensal (f.id) where mes = 'JAN') as jan,
+    (select geracao from fvt_geracao_mensal (f.id) where mes = 'FEV') as fev,
+    (select geracao from fvt_geracao_mensal (f.id) where mes = 'MAR') as mar,
+    (select geracao from fvt_geracao_mensal (f.id) where mes = 'ABR') as abril,
+    (select geracao from fvt_geracao_mensal (f.id) where mes = 'MAI') as maio,
+    (select geracao from fvt_geracao_mensal (f.id) where mes = 'JUN') as jun,
+    (select geracao from fvt_geracao_mensal (f.id) where mes = 'JUL') as jul,
+    (select geracao from fvt_geracao_mensal (f.id) where mes = 'AGO') as ago,
+    (select geracao from fvt_geracao_mensal (f.id) where mes = 'SET') as setembro,
+    (select geracao from fvt_geracao_mensal (f.id) where mes = 'OUT') as out,
+    (select geracao from fvt_geracao_mensal (f.id) where mes = 'NOV') as nov,
+    (select geracao from fvt_geracao_mensal (f.id) where mes = 'DEZ') as dez
+
+from
+
+    fvt_dimensionamento f
+
+where
+    f.id = :id
