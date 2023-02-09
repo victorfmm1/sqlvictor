@@ -67,6 +67,18 @@ with v as (
 )
 
 select
+     jan_ano1,
+     fev_ano1,
+     mar_ano1,
+     abr_ano1,
+     mai_ano1,
+     jun_ano1,
+     jul_ano1,
+     ago_ano1,
+     sete_ano1,
+     out_ano1,
+     nov_ano1,
+     dez_ano1,
     (media_ano2 + (media_ano2 * 0.45)) as media_ano2,
     consumo_ano2,
     (media_ano3 * 1.49) as media_ano3,
@@ -94,6 +106,26 @@ select
     cast(round((100-((v.sete_ano1*100) / set_consumo)),1) as decimal(12,2)) as resultado_setembro,
     cast(round((100-((v.out_ano1*100) / out_consumo)),1) as decimal(12,2)) as resultado_outubro,
     cast(round((100-((v.nov_ano1*100) / nov_consumo)),1) as decimal(12,2)) as resultado_novembro,
-    cast(round((100-((v.dez_ano1*100) / dez_consumo)),1) as decimal(12,2)) as resultado_dezembro
+    cast(round((100-((v.dez_ano1*100) / dez_consumo)),1) as decimal(12,2)) as resultado_dezembro,
+    cast(round((100-((media_ano2*100) / consumo_ano2)),1) as decimal(12,2)) as resultado_ano2,
+    cast(round((100-((media_ano3*100) / consumo_ano3)),1) as decimal(12,2)) as resultado_ano3,
+    cast(round((100-((media_ano4*100) / consumo_ano4)),1) as decimal(12,2)) as resultado_ano4,
+    cast(round((100-((media_ano5*100) / consumo_ano5)),1) as decimal(12,2)) as resultado_ano5,
+    cast(round((100-((media_ano6*100) / consumo_ano6)),1) as decimal(12,2)) as resultado_ano6,
+    cast(round((100-((media_ano7*100) / consumo_ano7)),1) as decimal(12,2)) as resultado_ano7,
+    cast(round((100-((media_ano8*100) / consumo_ano8)),1) as decimal(12,2)) as resultado_ano8,
+    cast(round((100-((media_ano9*100) / consumo_ano9)),1) as decimal(12,2)) as resultado_ano9,
+    jan_consumo,
+    fev_consumo,
+    mar_consumo,
+    abril_consumo,
+    maio_consumo,
+    jun_consumo,
+    jul_consumo,
+    ago_consumo,
+    set_consumo,
+    out_consumo,
+    nov_consumo,
+    dez_consumo
 
 from v
