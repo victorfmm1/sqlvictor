@@ -3,11 +3,14 @@ with v as (
     select
 
     (fvt.consumo_janeiro * fvt.tarifa_energia) as jan_consumo,
-    ((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'JAN') * (fvt.tarifa_energia + (0.3 * 0.15))) as jan_pot,
-    ((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'JAN') * (0.3 * 0.15)) as jan_semtx,
+--    ((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'JAN') * (fvt.tarifa_energia + (0.3 * 0.15))) as jan_pot,
+--    ((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'JAN') * (0.3 * 0.15)) as jan_semtx,
+    ((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'JAN') * (1-0.3)*(0.05)) as jan_ano1,
+    ((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'JAN') * (1-0.3)*(0.10)) as jan_ano2,
 
     (fvt.consumo_fevereiro * fvt.tarifa_energia) as fev_consumo,
     ((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'FEV') * fvt.tarifa_energia) as fev_pot,
+    ((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'FEV') * (0.48)*(0.05)) as fev_teste,
 
     (fvt.consumo_marco * fvt.tarifa_energia) as mar_consumo,
     ((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'MAR') * fvt.tarifa_energia) as mar_pot,
@@ -45,10 +48,10 @@ with v as (
 )
 
 select
-    v.jan_consumo,
-    v.jan_pot,
-    v.jan_semtx,
-    cast(round((100-((v.jan_pot) / jan_consumo)),1) as decimal(12,2)) as resultado_janeiro,
+    V.jan_ano1,
+    V.jan_ano2,
+    cast(round((100-((v.jan_ano1) / jan_consumo)),1) as decimal(12,2)) as resultado_janeiro,
+    cast(round((100-((v.jan_semtx) / jan_consumo)),1) as decimal(12,2)) as resultado_janeiro,
     cast(round((100-((v.fev_pot) / jan_consumo)),1) as decimal(12,2)) as resultado_fevereiro,
     cast(round((100-((v.mar_pot) / mar_consumo)),1) as decimal(12,2)) as resultado_marco,
     cast(round((100-((v.abril_pot) / abril_consumo)),1) as decimal(12,2)) as resultado_abril,
