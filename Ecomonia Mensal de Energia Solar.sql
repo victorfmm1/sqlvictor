@@ -1,46 +1,65 @@
-/*usar apenas o fio B para apresentar a proposta, sendo a % do ano +*/
 with v as (
     select
 
+    ceiling((fvt.consumo_media * (fvt.tarifa_energia * 1.08))) as consumo_ano2,
+    ceiling(((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'MÉDIA') * (1-0.25)*(0.10))) as media_ano2,
+
+    ceiling((fvt.consumo_media * (fvt.tarifa_energia * 1.19))) as consumo_ano3,
+    ceiling(((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'MÉDIA') * (1-0.25)*(0.15))) as media_ano3,
+
+    ceiling((fvt.consumo_media * (fvt.tarifa_energia * 1.30))) as consumo_ano4,
+    ceiling(((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'MÉDIA') * (1-0.25)*(0.20))) as media_ano4,
+
+    ceiling((fvt.consumo_media * (fvt.tarifa_energia * 1.44))) as consumo_ano5,
+    ceiling(((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'MÉDIA') * (1-0.25)*(0.25))) as media_ano5,
+
+    ceiling((fvt.consumo_media * (fvt.tarifa_energia * 1.59))) as consumo_ano6,
+    ceiling(((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'MÉDIA') * (1-0.25)*(0.30))) as media_ano6,
+
+    ceiling((fvt.consumo_media * (fvt.tarifa_energia * 1.75))) as consumo_ano7,
+    ceiling(((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'MÉDIA') * (1-0.25)*(0.30))) as media_ano7,
+
+    ceiling((fvt.consumo_media * (fvt.tarifa_energia * 1.93))) as consumo_ano8,
+    ceiling(((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'MÉDIA') * (1-0.25)*(0.30))) as media_ano8,
+
+    ceiling((fvt.consumo_media * (fvt.tarifa_energia * 2.12))) as consumo_ano9,
+    ceiling(((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'MÉDIA') * (1-0.25)*(0.32))) as media_ano9,
+
     (fvt.consumo_janeiro * fvt.tarifa_energia) as jan_consumo,
---    ((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'JAN') * (fvt.tarifa_energia + (0.3 * 0.15))) as jan_pot,
---    ((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'JAN') * (0.3 * 0.15)) as jan_semtx,
-    ((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'JAN') * (1-0.3)*(0.05)) as jan_ano1,
-    ((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'JAN') * (1-0.3)*(0.10)) as jan_ano2,
+    ((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'JAN') * (1-0.25)*(0.05)) as jan_ano1,
 
     (fvt.consumo_fevereiro * fvt.tarifa_energia) as fev_consumo,
-    ((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'FEV') * fvt.tarifa_energia) as fev_pot,
-    ((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'FEV') * (0.48)*(0.05)) as fev_teste,
+    ((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'FEV') * (1-0.25)*(0.05)) as fev_ano1,
 
     (fvt.consumo_marco * fvt.tarifa_energia) as mar_consumo,
-    ((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'MAR') * fvt.tarifa_energia) as mar_pot,
+    ((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'MAR') * (1-0.25)*(0.05)) as mar_ano1,
 
     (fvt.consumo_abril * fvt.tarifa_energia) as abril_consumo,
-    ((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'ABR') * fvt.tarifa_energia) as abril_pot,
+    ((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'ABR')* (1-0.25)*(0.05)) as abr_ano1,
 
     (fvt.consumo_maio * fvt.tarifa_energia) as maio_consumo,
-    ((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'MAI') * fvt.tarifa_energia) as maio_pot,
+    ((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'MAI') * (1-0.25)*(0.05)) as mai_ano1,
 
     (fvt.consumo_junho * fvt.tarifa_energia) as jun_consumo,
-    ((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'JUN') * fvt.tarifa_energia) as JUN_pot,
+    ((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'JUN') * (1-0.25)*(0.05)) as jun_ano1,
 
     (fvt.consumo_julho * fvt.tarifa_energia) as jul_consumo,
-    ((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'JUL') * fvt.tarifa_energia) as JUL_pot,
+    ((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'JUL') * (1-0.25)*(0.05)) as jul_ano1,
 
     (fvt.consumo_agosto * fvt.tarifa_energia) as ago_consumo,
-    ((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'AGO') * fvt.tarifa_energia) as AGO_pot,
+    ((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'AGO') * (1-0.25)*(0.05)) as ago_ano1,
 
     (fvt.consumo_setembro * fvt.tarifa_energia) as set_consumo,
-    ((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'SET') * fvt.tarifa_energia) as SET_pot,
+    ((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'SET') * (1-0.25)*(0.05)) as sete_ano1,
 
     (fvt.consumo_outubro * fvt.tarifa_energia) as out_consumo,
-    ((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'OUT') * fvt.tarifa_energia) as OUT_pot,
+    ((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'OUT') * (1-0.25)*(0.05)) as out_ano1,
 
     (fvt.consumo_novembro * fvt.tarifa_energia) as nov_consumo,
-    ((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'NOV') * fvt.tarifa_energia) as NOV_pot,
+    ((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'NOV') * (1-0.25)*(0.05)) as nov_ano1,
 
     (fvt.consumo_dezembro * fvt.tarifa_energia) as dez_consumo,
-    ((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'DEZ') * fvt.tarifa_energia) as DEZ_pot
+    ((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'DEZ') * (1-0.25)*(0.05)) as dez_ano1
 
     from
     fvt_dimensionamento fvt
@@ -48,20 +67,33 @@ with v as (
 )
 
 select
-    V.jan_ano1,
-    V.jan_ano2,
-    cast(round((100-((v.jan_ano1) / jan_consumo)),1) as decimal(12,2)) as resultado_janeiro,
-    cast(round((100-((v.jan_semtx) / jan_consumo)),1) as decimal(12,2)) as resultado_janeiro,
-    cast(round((100-((v.fev_pot) / jan_consumo)),1) as decimal(12,2)) as resultado_fevereiro,
-    cast(round((100-((v.mar_pot) / mar_consumo)),1) as decimal(12,2)) as resultado_marco,
-    cast(round((100-((v.abril_pot) / abril_consumo)),1) as decimal(12,2)) as resultado_abril,
-    cast(round((100-((v.maio_pot) / maio_consumo)),1) as decimal(12,2)) as resultado_maio,
-    cast(round((100-((v.jun_pot) / jun_consumo)),1) as decimal(12,2)) as resultado_junho,
-    cast(round((100-((v.jul_pot) / jul_consumo)),1) as decimal(12,2)) as resultado_julho,
-    cast(round((100-((v.ago_pot) / ago_consumo)),1) as decimal(12,2)) as resultado_agosto,
-    cast(round((100-((v.set_pot) / set_consumo)),1) as decimal(12,2)) as resultado_setembro,
-    cast(round((100-((v.out_pot) / out_consumo)),1) as decimal(12,2)) as resultado_outubro,
-    cast(round((100-((v.nov_pot) / nov_consumo)),1) as decimal(12,2)) as resultado_novembro,
-    cast(round((100-((v.dez_pot ) / dez_consumo)),1) as decimal(12,2)) as resultado_dezembro
+    (media_ano2 + (media_ano2 * 0.45)) as media_ano2,
+    consumo_ano2,
+    (media_ano3 * 1.49) as media_ano3,
+    consumo_ano3,
+    (media_ano4 * 1.64)media_ano4,
+    consumo_ano4,
+    (media_ano5 * 1.8)media_ano5,
+    consumo_ano5,
+    (media_ano6 * 2)media_ano6,
+    consumo_ano6,
+    (media_ano7 * 2.21)media_ano7,
+    consumo_ano7,
+    (media_ano8 * 2.42)media_ano8,
+    consumo_ano8,
+    (media_ano9 * 2.51)media_ano9,
+    consumo_ano9,
+    cast(round((100-((v.jan_ano1*100) / jan_consumo)),1) as decimal(12,2)) as resultado_janeiro,
+    cast(round((100-((v.fev_ano1*100) / jan_consumo)),1) as decimal(12,2)) as resultado_fevereiro,
+    cast(round((100-((v.mar_ano1*100) / mar_consumo)),1) as decimal(12,2)) as resultado_marco,
+    cast(round((100-((v.abr_ano1*100) / abril_consumo)),1) as decimal(12,2)) as resultado_abril,
+    cast(round((100-((v.mai_ano1*100) / maio_consumo)),1) as decimal(12,2)) as resultado_maio,
+    cast(round((100-((v.jun_ano1*100) / jun_consumo)),1) as decimal(12,2)) as resultado_junho,
+    cast(round((100-((v.jul_ano1*100) / jul_consumo)),1) as decimal(12,2)) as resultado_julho,
+    cast(round((100-((v.ago_ano1*100) / ago_consumo)),1) as decimal(12,2)) as resultado_agosto,
+    cast(round((100-((v.sete_ano1*100) / set_consumo)),1) as decimal(12,2)) as resultado_setembro,
+    cast(round((100-((v.out_ano1*100) / out_consumo)),1) as decimal(12,2)) as resultado_outubro,
+    cast(round((100-((v.nov_ano1*100) / nov_consumo)),1) as decimal(12,2)) as resultado_novembro,
+    cast(round((100-((v.dez_ano1*100) / dez_consumo)),1) as decimal(12,2)) as resultado_dezembro
 
 from v
