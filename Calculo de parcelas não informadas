@@ -1,0 +1,27 @@
+with r as(
+  select
+
+     (fdf.valor / 12) as Parcelas_12,
+     (fdf.valor / 24) as Parcelas_24,
+     (fdf.valor / 36) as Parcelas_36,
+     (fdf.valor / 48) as Parcelas_48,
+     (fdf.valor / 60) as Parcelas_60,
+     (fdf.valor / 72) as Parcelas_72
+
+
+    from fvt_dimensionamento_financeiro fdf
+    left join condicoes_recebimento cr on cr.CODCONDREC =  fdf.condicao_recebimento
+    left join formas_pagar_receber fpr on fpr.forma = fdf.forma_recebimento                                                                                                                                                                 
+    where fdf.id_dimensionamento = :id_dimensionamento)
+
+   select
+
+   (r.Parcelas_12 + (r.Parcelas_12*(0.1201))) as final_12,
+   (r.Parcelas_24 + (r.Parcelas_24*(0.2389))) as final_24,
+   (r.Parcelas_36 + (r.Parcelas_36*(0.7869))) as final_36,
+   (r.Parcelas_48 + (r.Parcelas_48*(0.4988))) as final_48,
+   r.parcelas_60,
+   (r.Parcelas_60 + (r.Parcelas_60*(0.61))) as final_60,
+   (r.Parcelas_72 + (r.Parcelas_72*(0.7869))) as final_72
+
+   from r
