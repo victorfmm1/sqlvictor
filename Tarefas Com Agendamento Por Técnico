@@ -1,0 +1,28 @@
+select
+
+  pt.id_tarefa,
+  p.dscprojeto,
+  pp.parceiro,
+  pp.nome,
+  pp.celular,
+  pt.dataprevisao,
+  pt.horaprevisao,
+  pr.nome,
+  pp.endereco,
+  pp.numero,
+  pp.bairro,
+  pp.cep
+
+from
+
+ tarefas t
+ left join projetos_tarefas pt on t.id = pt.id_tarefa
+ left join projetos p on p.projeto_id = pt.id_tarefa
+ left join parceiros pp on pp.parceiro = p.parceiro
+ left join parceiros pr on pr.parceiro = pt.id_responsavel
+
+where
+
+  pt.dataprevisao between :DataIni and :DataFinal
+  and (pt.id_responsavel = :Resp or (:resp = 0))
+  and (pt.id_tarefa = :tarefa or (:Tarefa = 0))
