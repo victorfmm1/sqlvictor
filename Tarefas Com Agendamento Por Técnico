@@ -1,6 +1,7 @@
 select
 
   pt.id_tarefa,
+  t.tarefa,
   p.dscprojeto,
   pp.parceiro,
   pp.nome,
@@ -26,3 +27,5 @@ where
   pt.dataprevisao between :DataIni and :DataFinal
   and (pt.id_responsavel = :Resp or (:resp = 0))
   and (pt.id_tarefa = :tarefa or (:Tarefa = 0))
+
+  ORDER BY p.projeto_id
