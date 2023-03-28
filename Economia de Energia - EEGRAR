@@ -1,0 +1,97 @@
+with v as (
+    select
+
+    
+    ceiling((fvt.consumo_janeiro * fvt.tarifa_energia)) as consumo_ano1,
+    ceiling(((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'MÉDIA') * (1-0)*(0.05))) as media_ano1,
+
+    ceiling((fvt.consumo_media * (fvt.tarifa_energia * 1.08))) as consumo_ano2,
+    ceiling(((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'MÉDIA') * (1-0)*(0.10))) as media_ano2,
+
+    ceiling((fvt.consumo_media * (fvt.tarifa_energia * 1.19))) as consumo_ano3,
+    ceiling(((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'MÉDIA') * (1-0)*(0.15))) as media_ano3,
+
+    ceiling((fvt.consumo_media * (fvt.tarifa_energia * 1.30))) as consumo_ano4,
+    ceiling(((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'MÉDIA') * (1-0)*(0.20))) as media_ano4,
+
+    ceiling((fvt.consumo_media * (fvt.tarifa_energia * 1.44))) as consumo_ano5,
+    ceiling(((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'MÉDIA') * (1-0)*(0.25))) as media_ano5,
+
+    ceiling((fvt.consumo_media * (fvt.tarifa_energia * 1.59))) as consumo_ano6,
+    ceiling(((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'MÉDIA') * (1-0)*(0.30))) as media_ano6,
+
+    ceiling((fvt.consumo_media * (fvt.tarifa_energia * 1.75))) as consumo_ano7,
+    ceiling(((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'MÉDIA') * (1-0)*(0.30))) as media_ano7,
+
+    ceiling((fvt.consumo_media * (fvt.tarifa_energia * 1.93))) as consumo_ano8,
+    ceiling(((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'MÉDIA') * (1-0)*(0.30))) as media_ano8,
+
+    ceiling((fvt.consumo_media * (fvt.tarifa_energia * 2.12))) as consumo_ano9,
+    ceiling(((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'MÉDIA') * (1-0)*(0.32))) as media_ano9,
+    with v as (
+    select
+        ceiling((fvt.consumo_media * (fvt.tarifa_energia * 1.44))) as consumo_ano5,
+        ceiling(((select geracao from fvt_geracao_mensal(fvt.id) where mes = 'MÉDIA') * (1 - 0) * (0.25))) as media_ano5,
+
+        ceiling((fvt.consumo_media * (fvt.tarifa_energia * 1.59))) as consumo_ano6,
+        ceiling(((select geracao from fvt_geracao_mensal(fvt.id) where mes = 'MÉDIA') * (1 - 0) * (0.30))) as media_ano6,
+
+        ceiling((fvt.consumo_media * (fvt.tarifa_energia * 1.75))) as consumo_ano7,
+        ceiling(((select geracao from fvt_geracao_mensal(fvt.id) where mes = 'MÉDIA') * (1 - 0) * (0.30))) as media_ano7,
+
+        ceiling((fvt.consumo_media * (fvt.tarifa_energia * 1.93))) as consumo_ano8,
+        ceiling(((select geracao from fvt_geracao_mensal(fvt.id) where mes = 'MÉDIA') * (1 - 0) * (0.30))) as media_ano8,
+
+        ceiling((fvt.consumo_media * (fvt.tarifa_energia * 2.12))) as consumo_ano9,
+        ceiling(((select geracao from fvt_geracao_mensal(fvt.id) where mes = 'MÉDIA') * (1 - 0) * (0.30))) as media_ano9,
+
+        ceiling((fvt.consumo_media * (fvt.tarifa_energia * 2.33))) as consumo_ano10,
+        ceiling(((select geracao from fvt_geracao_mensal(fvt.id) where mes = 'MÉDIA') * (1 - 0) * (0.30))) as media_ano10,
+
+        ceiling((fvt.consumo_media * (fvt.tarifa_energia * 2.56))) as consumo_ano11,
+        ceiling(((select geracao from fvt_geracao_mensal(fvt.id) where mes = 'MÉDIA') * (1 - 0) * (0.30))) as media_ano11,
+
+        ceiling((fvt.consumo_media * (fvt.tarifa_energia * 2.81))) as consumo_ano12,
+        ceiling(((select geracao from fvt_geracao_mensal(fvt.id) where mes = 'MÉDIA') * (1 - 0) * (0.30))) as media_ano12,
+
+        ceiling((fvt.consumo_media * (fvt.tarifa_energia * 3.08))) as consumo_ano13,
+        ceiling(((select geracao from fvt_geracao_mensal(fvt.id) where mes = 'MÉDIA') * (1 - 0) * (0.30))) as media_ano13,
+
+        ceiling((fvt.consumo_media * (fvt.tarifa_energia * 3.38))) as consumo_ano14,
+        ceiling(((select geracao from fvt_geracao_mensal(fvt.id) where mes = 'MÉDIA') * (1 - 0) * (0.30))) as media_ano14
+
+
+    from
+    fvt_dimensionamento fvt
+    where fvt.id = :id
+)
+select
+    media_ano1,
+    consumo_ano1,
+    (media_ano2 + (media_ano2 * 0.45)) as media_ano2,
+    consumo_ano2,
+    (media_ano3 * 1.49) as media_ano3,
+    consumo_ano3,
+    (media_ano4 * 1.64)media_ano4,
+    consumo_ano4,
+    (media_ano5 * 1.8)media_ano5,
+    consumo_ano5,
+    (media_ano6 * 2)media_ano6,
+    consumo_ano6,
+    (media_ano7 * 2.21)media_ano7,
+    consumo_ano7,
+    (media_ano8 * 2.42)media_ano8,
+    consumo_ano8,
+    (media_ano9 * 2.51)media_ano9,
+    consumo_ano9,
+    (media_ano10 * 2.65) as media_ano10,
+    consumo_ano10,
+    (media_ano11 * 2.79) as media_ano11,
+    consumo_ano11,
+    (media_ano12 * 2.94) as media_ano12,
+    consumo_ano12,
+    (media_ano13 * 3.09) as media_ano13,
+    consumo_ano13,
+    (media_ano14 * 3.25) as media_ano14,
+    consumo_ano14
+from v
