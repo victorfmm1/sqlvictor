@@ -2,46 +2,46 @@ with v as (
     select
 
     ceiling((fvt.consumo_janeiro * fvt.tarifa_energia)) as semsolar_ano1,
-    ceiling(((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'MÉDIA') * (1-0)*(0.05))) as novalei_ano1,
+    ceiling(((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'MÉDIA') * (1-3)*(0.05))) as novalei_ano1,
 
     ceiling((fvt.consumo_media * (fvt.tarifa_energia * 1.08))) as semsolar_ano2,
-    ceiling(((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'MÉDIA') * (1-0)*(0.10))) as novalei_ano2,
+    ceiling(((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'MÉDIA') * (1-3)*(0.10))) as novalei_ano2,
 
     ceiling((fvt.consumo_media * (fvt.tarifa_energia * 1.19))) as semsolar_ano3,
-    ceiling(((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'MÉDIA') * (1-0)*(0.15))) as novalei_ano3,
+    ceiling(((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'MÉDIA') * (1-3)*(0.15))) as novalei_ano3,
 
     ceiling((fvt.consumo_media * (fvt.tarifa_energia * 1.30))) as semsolar_ano4,
-    ceiling(((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'MÉDIA') * (1-0)*(0.20))) as novalei_ano4,
+    ceiling(((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'MÉDIA') * (1-3)*(0.20))) as novalei_ano4,
 
     ceiling((fvt.consumo_media * (fvt.tarifa_energia * 1.44))) as semsolar_ano5,
-    ceiling(((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'MÉDIA') * (1-0)*(0.25))) as novalei_ano5,
+    ceiling(((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'MÉDIA') * (1-3)*(0.25))) as novalei_ano5,
 
     ceiling((fvt.consumo_media * (fvt.tarifa_energia * 1.59))) as semsolar_ano6,
-    ceiling(((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'MÉDIA') * (1-0)*(0.30))) as novalei_ano6,
+    ceiling(((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'MÉDIA') * (1-3)*(0.30))) as novalei_ano6,
 
     ceiling((fvt.consumo_media * (fvt.tarifa_energia * 1.75))) as semsolar_ano7,
-    ceiling(((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'MÉDIA') * (1-0)*(0.30))) as novalei_ano7,
+    ceiling(((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'MÉDIA') * (1-3)*(0.30))) as novalei_ano7,
 
     ceiling((fvt.consumo_media * (fvt.tarifa_energia * 1.93))) as semsolar_ano8,
-    ceiling(((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'MÉDIA') * (1-0)*(0.30))) as novalei_ano8,
+    ceiling(((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'MÉDIA') * (1-3)*(0.30))) as novalei_ano8,
 
     ceiling((fvt.consumo_media * (fvt.tarifa_energia * 2.12))) as semsolar_ano9,
-    ceiling(((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'MÉDIA') * (1-0)*(0.30))) as novalei_ano9,
+    ceiling(((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'MÉDIA') * (1-3)*(0.30))) as novalei_ano9,
 
     ceiling((fvt.consumo_media * (fvt.tarifa_energia * 2.33))) as semsolar_ano10,
-    ceiling(((select geracao from fvt_geracao_mensal(fvt.id) where mes = 'MÉDIA') * (1-0) * (0.30))) as novalei_ano10,
+    ceiling(((select geracao from fvt_geracao_mensal(fvt.id) where mes = 'MÉDIA') * (1-3) * (0.30))) as novalei_ano10,
     
     ceiling((fvt.consumo_media * (fvt.tarifa_energia * 2.56))) as semsolar_ano11,
-    ceiling(((select geracao from fvt_geracao_mensal(fvt.id) where mes = 'MÉDIA') * (1-0) * (0.30))) as novalei_ano11,
+    ceiling(((select geracao from fvt_geracao_mensal(fvt.id) where mes = 'MÉDIA') * (1-3) * (0.30))) as novalei_ano11,
     
     ceiling((fvt.consumo_media * (fvt.tarifa_energia * 2.81))) as semsolar_ano12,
-    ceiling(((select geracao from fvt_geracao_mensal(fvt.id) where mes = 'MÉDIA') * (1-0) * (0.30))) as novalei_ano12,
+    ceiling(((select geracao from fvt_geracao_mensal(fvt.id) where mes = 'MÉDIA') * (1-3) * (0.30))) as novalei_ano12,
     
     ceiling((fvt.consumo_media * (fvt.tarifa_energia * 3.08))) as semsolar_ano13,
-    ceiling(((select geracao from fvt_geracao_mensal(fvt.id) where mes = 'MÉDIA') * (1-0) * (0.30))) as novalei_ano13,
+    ceiling(((select geracao from fvt_geracao_mensal(fvt.id) where mes = 'MÉDIA') * (1-3) * (0.30))) as novalei_ano13,
     
     ceiling((fvt.consumo_media * (fvt.tarifa_energia * 3.38))) as semsolar_ano14,
-    ceiling(((select geracao from fvt_geracao_mensal(fvt.id) where mes = 'MÉDIA') * (1-0) * (0.30))) as novalei_ano14
+    ceiling(((select geracao from fvt_geracao_mensal(fvt.id) where mes = 'MÉDIA') * (1-3) * (0.30))) as novalei_ano14
 
 
     from
