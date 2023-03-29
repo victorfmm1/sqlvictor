@@ -1,7 +1,6 @@
 with v as (
     select
 
-    
     ceiling((fvt.consumo_janeiro * fvt.tarifa_energia)) as consumo_ano1,
     ceiling(((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'MÉDIA') * (1-0)*(0.05))) as media_ano1,
 
@@ -27,43 +26,27 @@ with v as (
     ceiling(((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'MÉDIA') * (1-0)*(0.30))) as media_ano8,
 
     ceiling((fvt.consumo_media * (fvt.tarifa_energia * 2.12))) as consumo_ano9,
-    ceiling(((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'MÉDIA') * (1-0)*(0.32))) as media_ano9,
-    with v as (
-    select
-        ceiling((fvt.consumo_media * (fvt.tarifa_energia * 1.44))) as consumo_ano5,
-        ceiling(((select geracao from fvt_geracao_mensal(fvt.id) where mes = 'MÉDIA') * (1 - 0) * (0.25))) as media_ano5,
+    ceiling(((select geracao from fvt_geracao_mensal (fvt.id) where mes = 'MÉDIA') * (1-0)*(0.30))) as media_ano9,
 
-        ceiling((fvt.consumo_media * (fvt.tarifa_energia * 1.59))) as consumo_ano6,
-        ceiling(((select geracao from fvt_geracao_mensal(fvt.id) where mes = 'MÉDIA') * (1 - 0) * (0.30))) as media_ano6,
-
-        ceiling((fvt.consumo_media * (fvt.tarifa_energia * 1.75))) as consumo_ano7,
-        ceiling(((select geracao from fvt_geracao_mensal(fvt.id) where mes = 'MÉDIA') * (1 - 0) * (0.30))) as media_ano7,
-
-        ceiling((fvt.consumo_media * (fvt.tarifa_energia * 1.93))) as consumo_ano8,
-        ceiling(((select geracao from fvt_geracao_mensal(fvt.id) where mes = 'MÉDIA') * (1 - 0) * (0.30))) as media_ano8,
-
-        ceiling((fvt.consumo_media * (fvt.tarifa_energia * 2.12))) as consumo_ano9,
-        ceiling(((select geracao from fvt_geracao_mensal(fvt.id) where mes = 'MÉDIA') * (1 - 0) * (0.30))) as media_ano9,
-
-        ceiling((fvt.consumo_media * (fvt.tarifa_energia * 2.33))) as consumo_ano10,
-        ceiling(((select geracao from fvt_geracao_mensal(fvt.id) where mes = 'MÉDIA') * (1 - 0) * (0.30))) as media_ano10,
-
-        ceiling((fvt.consumo_media * (fvt.tarifa_energia * 2.56))) as consumo_ano11,
-        ceiling(((select geracao from fvt_geracao_mensal(fvt.id) where mes = 'MÉDIA') * (1 - 0) * (0.30))) as media_ano11,
-
-        ceiling((fvt.consumo_media * (fvt.tarifa_energia * 2.81))) as consumo_ano12,
-        ceiling(((select geracao from fvt_geracao_mensal(fvt.id) where mes = 'MÉDIA') * (1 - 0) * (0.30))) as media_ano12,
-
-        ceiling((fvt.consumo_media * (fvt.tarifa_energia * 3.08))) as consumo_ano13,
-        ceiling(((select geracao from fvt_geracao_mensal(fvt.id) where mes = 'MÉDIA') * (1 - 0) * (0.30))) as media_ano13,
-
-        ceiling((fvt.consumo_media * (fvt.tarifa_energia * 3.38))) as consumo_ano14,
-        ceiling(((select geracao from fvt_geracao_mensal(fvt.id) where mes = 'MÉDIA') * (1 - 0) * (0.30))) as media_ano14
+    ceiling((fvt.consumo_media * (fvt.tarifa_energia * 2.33))) as consumo_ano10,
+    ceiling(((select geracao from fvt_geracao_mensal(fvt.id) where mes = 'MÉDIA') * (1-0) * (0.30))) as media_ano10,
+    
+    ceiling((fvt.consumo_media * (fvt.tarifa_energia * 2.56))) as consumo_ano11,
+    ceiling(((select geracao from fvt_geracao_mensal(fvt.id) where mes = 'MÉDIA') * (1-0) * (0.30))) as media_ano11,
+    
+    ceiling((fvt.consumo_media * (fvt.tarifa_energia * 2.81))) as consumo_ano12,
+    ceiling(((select geracao from fvt_geracao_mensal(fvt.id) where mes = 'MÉDIA') * (1-0) * (0.30))) as media_ano12,
+    
+    ceiling((fvt.consumo_media * (fvt.tarifa_energia * 3.08))) as consumo_ano13,
+    ceiling(((select geracao from fvt_geracao_mensal(fvt.id) where mes = 'MÉDIA') * (1-0) * (0.30))) as media_ano13,
+    
+    ceiling((fvt.consumo_media * (fvt.tarifa_energia * 3.38))) as consumo_ano14,
+    ceiling(((select geracao from fvt_geracao_mensal(fvt.id) where mes = 'MÉDIA') * (1-0) * (0.30))) as media_ano14
 
 
     from
     fvt_dimensionamento fvt
-    where fvt.id = :id
+    where fvt.id = :id_dimensionamento
 )
 select
     media_ano1,
