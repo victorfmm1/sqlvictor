@@ -1,0 +1,75 @@
+SELECT 'media' AS MESS, consumo_media AS CONSUMO
+FROM fvt_dimensionamento
+WHERE id = :id_dimensionamento
+
+UNION ALL
+
+SELECT 'janeiro', consumo_media
+FROM fvt_dimensionamento
+WHERE id = :id_dimensionamento
+
+UNION ALL
+
+SELECT 'fevereiro', consumo_media
+FROM fvt_dimensionamento
+WHERE id = :id_dimensionamento
+
+UNION ALL
+
+SELECT 'marco', consumo_media
+FROM fvt_dimensionamento
+WHERE id = :id_dimensionamento
+
+UNION ALL
+
+SELECT 'abril', consumo_media
+FROM fvt_dimensionamento
+WHERE id = :id_dimensionamento
+
+UNION ALL
+
+SELECT 'maio', consumo_media
+FROM fvt_dimensionamento
+WHERE id = :id_dimensionamento
+
+UNION ALL
+
+SELECT 'junho', consumo_media
+FROM fvt_dimensionamento
+WHERE id = :id_dimensionamento
+
+UNION ALL
+
+SELECT 'julho', consumo_media
+FROM fvt_dimensionamento
+WHERE id = :id_dimensionamento
+
+UNION ALL
+
+SELECT 'agosto', consumo_media
+FROM fvt_dimensionamento
+WHERE id = :id_dimensionamento
+
+UNION ALL
+
+SELECT 'setembro', consumo_media
+FROM fvt_dimensionamento
+WHERE id = :id_dimensionamento
+
+UNION ALL
+
+SELECT 'outubro', consumo_media
+FROM fvt_dimensionamento
+WHERE id = :id_dimensionamento
+
+UNION ALL
+
+SELECT 'novembro', consumo_media
+FROM fvt_dimensionamento
+WHERE id = :id_dimensionamento
+
+UNION ALL
+
+SELECT 'dezembro', consumo_media
+FROM fvt_dimensionamento
+WHERE id = :id_dimensionamento;
