@@ -1,0 +1,13 @@
+select
+    distinct p.codproduto||'/'|| pc.codproduto_clas as codigo_produto,
+    p.cod_ncm as NCM,
+    pc.cest,
+    p.dscproduto || pc.dscproduto_clas as descricao,
+    gf.dscgrupo_fiscal as tributacao_atual
+
+from
+    produtos p
+    left JOIN produtos_clas pc on pc.codproduto = p.codproduto
+    left join grupos_fiscais gf on gf.grupo_fiscal = p.grupo_fiscal
+
+  order by 2
