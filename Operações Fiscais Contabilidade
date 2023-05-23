@@ -1,0 +1,36 @@
+select
+    gf.dscgrupo_fiscal,
+    ctb.codoper,
+    op.dscoper,
+    ctb.cfop_e,
+    ctb.cfop_i,
+    ctb.cod_csosn,
+    tb.dsctributacao,
+    tb.per_base_icms,
+    tb.per_icms,
+    tb.per_base_st,
+    tb.per_st,
+    tb.per_suspenso,
+    tb.per_isento,
+    tb.per_outros,
+    tb.per_base_ipi,
+    tb.per_ipi,
+    tb.per_issqn,
+    tb.per_ir,
+    tb.per_pis,
+    tb.per_cofins,
+    tb.per_base_issqn,
+    tb.per_isento_ipi,
+    tb.per_outros_ipi,
+    tb.per_icms_efetiva,
+    tb.codigo_externo,
+    tb.per_credito_icms,
+    tb.per_st_est_simples,
+    tb.per_redbc_difal
+from
+    grupos_fiscais gf
+    left join classificacao_tributaria ctb on gf.grupo_fiscal = ctb.grupo_fiscal
+    left join tributacoes tb on tb.codtributacao = ctb.codtributacao
+    left join operacoes op on op.codoper = ctb.codoper
+
+order by 2
