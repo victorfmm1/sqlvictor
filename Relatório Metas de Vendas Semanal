@@ -1,0 +1,20 @@
+SELECT 
+    V.Vendedor,
+    p.nome,
+    EXTRACT(YEAR FROM v.dtacomp) AS Ano,
+    EXTRACT(MONTH FROM v.dtacomp) AS Mes,
+    SUM(CASE WHEN EXTRACT(DAY FROM v.dtacomp) <= 7 THEN V.Valor ELSE 0 END) AS Semana1,
+    SUM(CASE WHEN EXTRACT(DAY FROM v.dtacomp) > 7 AND EXTRACT(DAY FROM v.dtacomp) <= 14 THEN V.Valor ELSE 0 END) AS Semana2,
+    SUM(CASE WHEN EXTRACT(DAY FROM v.dtacomp) > 14 AND EXTRACT(DAY FROM v.dtacomp) <= 21 THEN V.Valor ELSE 0 END) AS Semana3,
+    SUM(CASE WHEN EXTRACT(DAY FROM v.dtacomp) > 21 THEN V.Valor ELSE 0 END) AS Semana4,
+    SUM(V.Valor) AS TotalVendas,
+    SUM(OS.valor_liq_total) AS TotalOrdemServico,
+    MV.mes AS MetaMensal
+
+FROM VENDAS V
+LEFT JOIN OS ON V.Vendedor = OS.Vendedor AND EXTRACT(YEAR FROM V.Dtacomp) = EXTRACT(YEAR FROM OS.data_encerramento) AND EXTRACT(MONTH FROM V.dtacomp) = EXTRACT(MONTH FROM OS.data_encerramento)
+JOIN METAS_VENDAS MV ON V.Vendedor = MV.Vendedor AND EXTRACT(YEAR FROM v.dtacomp) = MV.Ano AND EXTRACT(MONTH FROM V.Dtacomp) = MV.Mes
+LEFT JOIN parceiros p ON MV.vendedor = p.parceiro
+WHERE MV.Mes = 5
+GROUP BY V.Vendedor, p.nome, EXTRACT(YEAR FROM v.dtacomp), EXTRACT(MONTH FROM v.dtacomp), MV.Mes
+ORDER BY V.Vendedor, EXTRACT(YEAR FROM v.dtacomp), EXTRACT(MONTH FROM v.dtacomp);
