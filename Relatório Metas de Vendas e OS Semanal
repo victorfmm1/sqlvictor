@@ -1,44 +1,27 @@
-SELECT 
-    V.Vendedor,
+select
+    tb.Vend,
     p.nome,
-    SUM(CASE WHEN EXTRACT(DAY FROM v.dtacomp) <= 7 THEN v.total_venda ELSE 0 END) AS Semana1,
-    SUM(CASE WHEN EXTRACT(DAY FROM v.dtacomp) > 7 AND EXTRACT(DAY FROM v.dtacomp) <= 14 THEN v.total_venda ELSE 0 END) AS Semana2,
-    SUM(CASE WHEN EXTRACT(DAY FROM v.dtacomp) > 14 AND EXTRACT(DAY FROM v.dtacomp) <= 21 THEN v.total_venda ELSE 0 END) AS Semana3,
-    SUM(CASE WHEN EXTRACT(DAY FROM v.dtacomp) > 21 THEN v.total_venda ELSE 0 END) AS Semana4,
-    SUM(v.total_venda) AS TotalFat,
+    SUM(CASE WHEN EXTRACT(DAY FROM tb.datacomp) <= 7 THEN tb.TotalVenda ELSE 0 END) AS Semana1,
+    SUM(CASE WHEN EXTRACT(DAY FROM tb.datacomp) > 7 AND EXTRACT(DAY FROM tb.datacomp) <= 14 THEN tb.TotalVenda ELSE 0 END) AS Semana2,
+    SUM(CASE WHEN EXTRACT(DAY FROM tb.datacomp) > 14 AND EXTRACT(DAY FROM tb.datacomp) <= 21 THEN tb.TotalVenda ELSE 0 END) AS Semana3,
+    SUM(CASE WHEN EXTRACT(DAY FROM tb.datacomp) > 21 THEN tb.TotalVenda ELSE 0 END) AS Semana4,
+    SUM(tb.TotalVenda) AS TotalVendas,
     mv.valor AS MetaMensal,
-    ROUND((SUM(v.total_venda) / mv.valor) * 100, 2) AS PercentualAtingido
+    ROUND ((SUM(tb.TotalVenda) / mv.valor) * 100 ,2) AS PercentualAtingido
+from
+        (select v.vendedor as vend, v.total_venda TotalVenda, v.dtacomp as datacomp
+        from vendas v
+        where v.dtacomp between :DataIni and :DataFim
+        AND v.idn_cancelada = 'N'
+        AND v.tipo_nd = 'N'
+        union all
+        select o.vendedor as vend,o.valor_liq_total as TotalVenda, o.data_encerramento as datacomp
+        from os o
+        where o.data_encerramento between :DataIni and :DataFim
+        AND o.idn_cancelada is null) as TB
+   left join parceiros p on tb.vend = p.parceiro
+   JOIN METAS_VENDAS MV ON tb.Vend = MV.Vendedor AND EXTRACT(YEAR FROM tb.datacomp) = MV.Ano AND EXTRACT(MONTH FROM tb.datacomp) = MV.Mes
+where
+tb.datacomp between :DataIni and :DataFim
 
-FROM VENDAS V
-JOIN METAS_VENDAS MV ON V.Vendedor = MV.Vendedor AND EXTRACT(YEAR FROM v.dtacomp) = MV.Ano AND EXTRACT(MONTH FROM V.Dtacomp) = MV.Mes
-LEFT JOIN parceiros p ON MV.vendedor = p.parceiro
-
-WHERE
-    v.dtacomp between :Data1 and :Data2
-    AND v.idn_cancelada = 'N'
-    AND v.tipo_nd = 'N'
-
-GROUP BY V.Vendedor, p.nome, mv.valor
-
-union all
-
-SELECT 
-    o.Vendedor,
-    p.nome,
-    SUM(CASE WHEN EXTRACT(DAY FROM o.data_encerramento) <= 7 THEN o.valor_liq_total ELSE 0 END) AS Semana1,
-    SUM(CASE WHEN EXTRACT(DAY FROM o.data_encerramento) > 7 AND EXTRACT(DAY FROM o.data_encerramento) <= 14 THEN o.valor_liq_total ELSE 0 END) AS Semana2,
-    SUM(CASE WHEN EXTRACT(DAY FROM o.data_encerramento) > 14 AND EXTRACT(DAY FROM o.data_encerramento) <= 21 THEN o.valor_liq_total ELSE 0 END) AS Semana3,
-    SUM(CASE WHEN EXTRACT(DAY FROM o.data_encerramento) > 21 THEN o.valor_liq_total ELSE 0 END) AS Semana4,
-    SUM(o.valor_liq_total) AS TotalFat,
-    mv.valor AS MetaMensal,
-    ROUND((SUM(o.valor_liq_total) / mv.valor) * 100, 2) AS PercentualAtingido
-
-FROM OS O
-JOIN METAS_VENDAS MV ON O.Vendedor = MV.Vendedor AND EXTRACT(YEAR FROM o.data_encerramento) = MV.Ano AND EXTRACT(MONTH FROM O.data_encerramento) = MV.Mes
-LEFT JOIN parceiros p ON MV.vendedor = p.parceiro
-
-WHERE
-    o.data_encerramento BETWEEN :Data1 AND :Data2
-    AND o.idn_cancelada is null
-
-GROUP BY O.Vendedor, p.nome, mv.valor
+group by tb.vend, p.nome, mv.valor
