@@ -6,17 +6,19 @@ SELECT
     SUM(CASE WHEN EXTRACT(DAY FROM v.dtacomp) > 14 AND EXTRACT(DAY FROM v.dtacomp) <= 21 THEN v.total_venda ELSE 0 END) AS Semana3,
     SUM(CASE WHEN EXTRACT(DAY FROM v.dtacomp) > 21 THEN v.total_venda ELSE 0 END) AS Semana4,
     SUM(v.total_venda) AS TotalVendas,
+    SUM(o.valor_liq_total) as TotalOS,
     mv.valor AS MetaMensal,
     (SUM(v.total_venda) / mv.valor) * 100 AS PercentualAtingido
 
 FROM VENDAS V
+LEFT JOIN os o on v.vendedor = o.vendedor and v.dtacomp = o.data_encerramento
 JOIN METAS_VENDAS MV ON V.Vendedor = MV.Vendedor AND EXTRACT(YEAR FROM v.dtacomp) = MV.Ano AND EXTRACT(MONTH FROM V.Dtacomp) = MV.Mes
 LEFT JOIN parceiros p ON MV.vendedor = p.parceiro
 
 WHERE
-    MV.Mes = 4
+    v.dtacomp between :Data1 and :Data2
     AND v.idn_cancelada = 'N'
     AND v.tipo_nd = 'N'
-
+    and o.idn_cancelada is null
 
 GROUP BY V.Vendedor, p.nome, mv.valor
