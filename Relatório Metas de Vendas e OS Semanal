@@ -1,0 +1,44 @@
+SELECT 
+    V.Vendedor,
+    p.nome,
+    SUM(CASE WHEN EXTRACT(DAY FROM v.dtacomp) <= 7 THEN v.total_venda ELSE 0 END) AS Semana1,
+    SUM(CASE WHEN EXTRACT(DAY FROM v.dtacomp) > 7 AND EXTRACT(DAY FROM v.dtacomp) <= 14 THEN v.total_venda ELSE 0 END) AS Semana2,
+    SUM(CASE WHEN EXTRACT(DAY FROM v.dtacomp) > 14 AND EXTRACT(DAY FROM v.dtacomp) <= 21 THEN v.total_venda ELSE 0 END) AS Semana3,
+    SUM(CASE WHEN EXTRACT(DAY FROM v.dtacomp) > 21 THEN v.total_venda ELSE 0 END) AS Semana4,
+    SUM(v.total_venda) AS TotalFat,
+    mv.valor AS MetaMensal,
+    ROUND((SUM(v.total_venda) / mv.valor) * 100, 2) AS PercentualAtingido
+
+FROM VENDAS V
+JOIN METAS_VENDAS MV ON V.Vendedor = MV.Vendedor AND EXTRACT(YEAR FROM v.dtacomp) = MV.Ano AND EXTRACT(MONTH FROM V.Dtacomp) = MV.Mes
+LEFT JOIN parceiros p ON MV.vendedor = p.parceiro
+
+WHERE
+    v.dtacomp between :Data1 and :Data2
+    AND v.idn_cancelada = 'N'
+    AND v.tipo_nd = 'N'
+
+GROUP BY V.Vendedor, p.nome, mv.valor
+
+union all
+
+SELECT 
+    o.Vendedor,
+    p.nome,
+    SUM(CASE WHEN EXTRACT(DAY FROM o.data_encerramento) <= 7 THEN o.valor_liq_total ELSE 0 END) AS Semana1,
+    SUM(CASE WHEN EXTRACT(DAY FROM o.data_encerramento) > 7 AND EXTRACT(DAY FROM o.data_encerramento) <= 14 THEN o.valor_liq_total ELSE 0 END) AS Semana2,
+    SUM(CASE WHEN EXTRACT(DAY FROM o.data_encerramento) > 14 AND EXTRACT(DAY FROM o.data_encerramento) <= 21 THEN o.valor_liq_total ELSE 0 END) AS Semana3,
+    SUM(CASE WHEN EXTRACT(DAY FROM o.data_encerramento) > 21 THEN o.valor_liq_total ELSE 0 END) AS Semana4,
+    SUM(o.valor_liq_total) AS TotalFat,
+    mv.valor AS MetaMensal,
+    ROUND((SUM(o.valor_liq_total) / mv.valor) * 100, 2) AS PercentualAtingido
+
+FROM OS O
+JOIN METAS_VENDAS MV ON O.Vendedor = MV.Vendedor AND EXTRACT(YEAR FROM o.data_encerramento) = MV.Ano AND EXTRACT(MONTH FROM O.data_encerramento) = MV.Mes
+LEFT JOIN parceiros p ON MV.vendedor = p.parceiro
+
+WHERE
+    o.data_encerramento BETWEEN :Data1 AND :Data2
+    AND o.idn_cancelada is null
+
+GROUP BY O.Vendedor, p.nome, mv.valor
