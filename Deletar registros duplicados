@@ -1,0 +1,14 @@
+delete from parceiros p1
+where p1.parceiro in (
+    with t as (
+    SELECT
+        ','||list(p.parceiro)||',' as todos,
+        MIN(p.parceiro) AS parceiro
+        
+        FROM parceiros p
+        GROUP BY nome
+        HAVING COUNT(p.parceiro) > 1)
+    
+    select p.parceiro
+    from parceiros p
+    join t on t.todos containing ','||p.parceiro||',' and t.parceiro <> p.parceiro)
