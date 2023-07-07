@@ -1,0 +1,26 @@
+SELECT DISTINCT
+    v.venda_id,
+    op.dscoper,
+    p.nome,
+    IIF(p.pessoa_fj = 'J', p.cnpj, p.cpf) AS CPFCNPJ,
+    v.num_nota,
+    ne.nfe_chave,
+    ne.cfop,
+    os.outra_saida_id,
+    os.num_nota AS num_nota_os,
+    ne_s.nfe_chave,
+    ne_s.cfop
+FROM
+    vendas v
+    LEFT JOIN vendas_itens vi ON vi.venda_id = v.venda_id
+    LEFT JOIN notas_emitidas ne ON v.num_nota = ne.num_nota AND v.parceiro = ne.parceiro
+    LEFT JOIN parceiros p ON v.parceiro = p.parceiro
+    LEFT JOIN operacoes op ON v.codoper = op.codoper
+    LEFT JOIN outras_saidas_itens osi ON osi.venda_id = v.venda_id AND osi.venda_item = vi.item
+    LEFT JOIN outras_saidas os ON os.outra_saida_id = osi.outra_saida_id   
+    LEFT JOIN notas_emitidas ne_s ON os.num_nota = ne_s.num_nota AND os.parceiro = ne_s.parceiro
+WHERE
+    v.dtacomp BETWEEN :DataInicial AND :DataFim
+    AND v.codoper = 101
+    AND v.num_nota IS NOT NULL
+    AND os.num_nota IS NOT NULL;
