@@ -1,0 +1,35 @@
+select
+    d2.codproduto,
+    d2.total_prod,
+    d2.total_geral,
+    d2.perc,
+    d2.perc_acu,
+    case
+      when d2.perc_acu <= 80 then 'A'
+      when d2.perc_acu <= 95 then 'B'
+      else 'C'
+    end as clase
+from (
+    select
+       d1.codproduto,
+       d1.total_prod,
+       d1.total_geral,
+       d1.perc,
+       SUM(d1.perc) over(order by d1.perc desc) as perc_acu
+    
+    from (
+        select
+         d.codproduto,
+         d.total_prod,
+         SUM(d.total_prod) over() as total_geral,
+         CAST(d.total_prod as numeric (15,3)) / CAST(SUM(d.total_prod) over() as numeric (15,3)) * 100 perc
+
+        from (
+            select
+                vi.codproduto || '/' || vi.codproduto_clas as codproduto,
+                SUM(vi.total) as total_prod
+            from
+                vendas_itens vi
+
+            group by codproduto
+            order by 2 desc) d) d1) d2
