@@ -30,6 +30,7 @@ from (
                 SUM(vi.total) as total_prod
             from
                 vendas_itens vi
-
+            where
+            vi.dtacomp between :DataIni and :DataFim
             group by codproduto
             order by 2 desc) d) d1) d2
