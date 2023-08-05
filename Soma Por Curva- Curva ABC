@@ -1,0 +1,108 @@
+with v as (
+select
+d3.codproduto,
+d3.descprod,
+d3.total_prod,
+d3.qtd,
+d3.total_geral,
+d3.perc,
+d3.perc_acu,
+d3.clase,
+case
+  when d3.clase = 'A' then SUM(d3.qtd) over(partition by d3.clase = 'A')
+else ''
+end as soma_qtd_A,
+case
+  when d3.clase = 'A' then SUM(d3.total_prod) over(partition by d3.clase = 'A')
+else '' end soma_total_A,
+case
+  when d3.clase = 'B' then SUM(d3.qtd) over(partition by d3.clase = 'B')
+else ''
+end as soma_qtd_B,
+case
+  when d3.clase = 'B' then SUM(d3.total_prod) over(partition by d3.clase = 'B')
+else '' end soma_total_B,
+case
+  when d3.clase = 'C' then SUM(d3.qtd) over(partition by d3.clase = 'C')
+else ''
+end as soma_qtd_C,
+case
+  when d3.clase = 'C' then SUM(d3.total_prod) over(partition by d3.clase = 'C')
+else '' end soma_total_C,
+case
+  when d3.clase = 'A' then COUNT(d3.codproduto) over(partition by d3.clase = 'A')
+else '' end soma_itens_A,
+case
+  when d3.clase = 'B' then COUNT(d3.codproduto) over(partition by d3.clase = 'B')
+else '' end soma_itens_B,
+case
+  when d3.clase = 'C' then COUNT(d3.codproduto) over(partition by d3.clase = 'C')
+else '' end soma_itens_C
+
+from (
+    select
+        d2.codproduto,
+        d2.descprod,
+        d2.total_prod,
+        d2.qtd,
+        d2.total_geral,
+        d2.perc,
+        d2.perc_acu,
+        case
+          when d2.perc_acu <= 80 then 'A'
+          when d2.perc_acu <= 95 then 'B'
+          else 'C'
+        end as clase
+    from (
+        select
+           d1.codproduto,
+           d1.descprod,
+           d1.total_prod,
+           d1.qtd,
+           d1.total_geral,
+           d1.perc,
+           SUM(d1.perc) over(order by d1.perc desc) as perc_acu
+        
+        from (
+            select
+             d.codproduto,
+             d.descprod,
+             d.total_prod,
+             d.qtd,
+             SUM(d.total_prod) over() as total_geral,
+             CAST(d.total_prod as numeric (15,3)) / CAST(SUM(d.total_prod) over() as numeric (15,3)) * 100 perc
+    
+            from (
+                select
+                    vi.codproduto || '/' || vi.codproduto_clas as codproduto,
+                    p.dscproduto || '/' || pc.dscproduto_clas as descprod,
+                    SUM(vi.total) as total_prod,
+                    SUM(vi.qtd) as qtd
+                from
+                    vendas_itens vi
+                    left join vendas v on v.venda_id = vi.venda_id
+                    left join produtos p on vi.codproduto = p.codproduto
+                    left join produtos_clas pc on vi.codproduto = pc.codproduto and vi.codproduto_clas = pc.codproduto_clas
+                    left join filiais f on v.codfilial = f.codfilial
+    
+                where
+                v.idn_cancelada = 'N'
+                AND v.tipo_nd = 'N'
+                AND vi.dtacomp between :DataIni and :DataFim
+    
+                group by 1,2
+                order by 3 desc) d) d1) d2)d3
+                order by d3.total_prod desc )
+
+select
+
+ROUND(COALESCE(MAX(CAST(v.soma_qtd_B AS NUMERIC)), 0), 2) AS soma_qtd_B,
+ROUND(COALESCE(MAX(CAST(v.soma_total_B AS NUMERIC)), 0), 2) AS soma_total_B,
+MAX(v.soma_itens_B) AS soma_sku_B
+
+from v
+
+where
+v.clase = 'B'
+
+/*onde está B sobstituir pela curva desejada*/
