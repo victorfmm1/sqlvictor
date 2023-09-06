@@ -1,0 +1,29 @@
+/*Condicionais que estão em vendas*/
+/*somar total faturado/devolvido*/
+/*somar total da venda*/
+/*Somar QTD condicional, vendido*/
+/*BUSCAR PERÍODO*/
+/*BUSCAR Vendedor*/
+select
+    distinct c.numcondicional,
+    v.venda_id,
+    SUM(c.valor_liquido) over() as CONDICIONAL,
+    SUM(c.qtd) over(partition by c.numcondicional) as QTD_CONDICIONAL,
+    SUM(c.qtd_venda) over(partition by c.numcondicional) as QTD_vendida,
+    SUM(c.qtd_saldo) over(partition by c.numcondicional) as saldo_CONDICIONAL,
+    SUM(vi.valor) over(partition by c.numcondicional) as Valor_venda_cond,
+    SUM(vi.valor) over(partition by vi.venda_id) as Valor_venda_Total,
+    v.vendedor,
+    p.nome
+
+from
+    vendas v
+    left join vendas_itens vi on v.venda_id = vi.venda_id
+    left join condicionais c on vi.condicional_id = c.condicional_id
+    left join parceiros p on v.vendedor = p.parceiro
+where
+    v.dtacomp between :DataIni and :DataFim
+    and (v.vendedor = :Vendedor or (:Vendedor = 0))
+    and v.idn_cancelada = 'N'
+
+order by v.venda_id
