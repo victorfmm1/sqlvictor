@@ -1,29 +1,44 @@
-/*Condicionais que estão em vendas*/
-/*somar total faturado/devolvido*/
-/*somar total da venda*/
-/*Somar QTD condicional, vendido*/
-/*BUSCAR PERÍODO*/
-/*BUSCAR Vendedor*/
-select
-    distinct c.numcondicional,
-    v.venda_id,
-    SUM(c.valor_liquido) over() as CONDICIONAL,
-    SUM(c.qtd) over(partition by c.numcondicional) as QTD_CONDICIONAL,
-    SUM(c.qtd_venda) over(partition by c.numcondicional) as QTD_vendida,
-    SUM(c.qtd_saldo) over(partition by c.numcondicional) as saldo_CONDICIONAL,
-    SUM(vi.valor) over(partition by c.numcondicional) as Valor_venda_cond,
-    SUM(vi.valor) over(partition by vi.venda_id) as Valor_venda_Total,
-    v.vendedor,
-    p.nome
+SELECT
+    FIRST_VALUE(a.SOMA_VALOR_CONDICIONAL) OVER(PARTITION BY a.vendedor ORDER BY a.vendedor DESC) AS VALOR_CONDICIONAL,
+    a.Valor_venda_Total,
+    a.vendedor,
+    a.nome,
+    null as dev_venda
+FROM (
+    SELECT
+        SUM(c.valor_liquido) OVER(PARTITION BY c.vendedor) AS SOMA_VALOR_CONDICIONAL,
+        SUM(vi.total_venda) OVER(PARTITION BY v.vendedor) AS Valor_venda_Total,
+        v.vendedor,
+        p.nome,
+        ROW_NUMBER() OVER(PARTITION BY v.vendedor ORDER BY v.venda_id) AS RowNum
+    FROM
+        vendas v
+        LEFT JOIN vendas_itens vi ON v.venda_id = vi.venda_id
+        LEFT JOIN condicionais c ON vi.condicional_id = c.condicional_id
+        LEFT JOIN parceiros p ON v.vendedor = p.parceiro
+    WHERE
+        v.dtacomp BETWEEN :DataIniVenda AND :DataFimVenda
+        AND (v.vendedor = :Vendedor OR (:Vendedor = 0))
+        AND v.idn_cancelada = 'N'
+        AND v.tipo_nd = 'N'
+        ) a
 
-from
-    vendas v
-    left join vendas_itens vi on v.venda_id = vi.venda_id
-    left join condicionais c on vi.condicional_id = c.condicional_id
-    left join parceiros p on v.vendedor = p.parceiro
-where
-    v.dtacomp between :DataIni and :DataFim
-    and (v.vendedor = :Vendedor or (:Vendedor = 0))
-    and v.idn_cancelada = 'N'
+WHERE a.RowNum = 1
 
-order by v.venda_id
+union all
+
+SELECT
+    null as VALOR_CONDICIONAL,
+    null as Valor_venda_Total,
+    null as vendedor,
+    null as nome,
+    SUM(vd.total_venda) over(partition by vd.vendedor) as dev_venda
+
+FROM
+    vendas vd
+
+WHERE
+    vd.dtacomp BETWEEN :DataIniVenda AND :DataFimVenda
+    and (vd.vendedor = :Vendedor OR (:Vendedor = 0))
+    and vd.codoper = 150
+    and vd.idn_cancelada= 'N'
