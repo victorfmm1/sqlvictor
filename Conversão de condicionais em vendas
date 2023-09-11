@@ -19,6 +19,7 @@ with pData as(
 SELECT
     SUM(iif(v.tipo_nd = 'D', v.total_venda, 0)) as dev_venda,
     SUM(iif(v.tipo_nd = 'N', v.total_venda, 0)) as total_venda,
+    SUM(iif(v.tipo_nd = 'N', v.total_venda, 0)) - SUM(iif(v.tipo_nd = 'D', v.total_venda, 0)) as total_venda_liquido,
     v.vendedor,
     pp.nome
 
