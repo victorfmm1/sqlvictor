@@ -1,21 +1,3 @@
-with pData as(
- select
-  cast(:pData as date) data
- from rdb$database )
-
-, pMesAtual as(
- select
-  cast(substring(p.Data from 1 for 8) || '01' as date) ini_mes,
-  dateadd(month, 1, cast(substring(p.Data from 1 for 8) || '01' as date))-1  fim_mes
-  from pData p)
-
-, parametro as (
- select
-  p.data,
-  atu.ini_mes,
-  atu.fim_mes
- from pData p, pMesAtual atu )
-
 SELECT
     SUM(iif(v.tipo_nd = 'D', v.total_venda, 0)) as dev_venda,
     SUM(iif(v.tipo_nd = 'N', v.total_venda, 0)) as total_venda,
@@ -23,13 +5,12 @@ SELECT
     v.vendedor,
     pp.nome
 
-
-FROM parametro p
-left JOIN vendas v ON v.dtacomp between p.ini_mes and p.fim_mes
-join parceiros pp on v.vendedor = pp.parceiro
+FROM vendas v
+    left join parceiros pp on v.vendedor = pp.parceiro
 
 WHERE
-    v.idn_cancelada = 'N'
+    v.dtacomp between :pDataIni and :pDataFim
+    AND v.idn_cancelada = 'N'
     AND (v.vendedor = :Vendedor OR (:Vendedor = 0))
 
 GROUP BY
