@@ -1,44 +1,35 @@
-SELECT
-    FIRST_VALUE(a.SOMA_VALOR_CONDICIONAL) OVER(PARTITION BY a.vendedor ORDER BY a.vendedor DESC) AS VALOR_CONDICIONAL,
-    a.Valor_venda_Total,
-    a.vendedor,
-    a.nome,
-    null as dev_venda
-FROM (
-    SELECT
-        SUM(c.valor_liquido) OVER(PARTITION BY c.vendedor) AS SOMA_VALOR_CONDICIONAL,
-        SUM(vi.total_venda) OVER(PARTITION BY v.vendedor) AS Valor_venda_Total,
-        v.vendedor,
-        p.nome,
-        ROW_NUMBER() OVER(PARTITION BY v.vendedor ORDER BY v.venda_id) AS RowNum
-    FROM
-        vendas v
-        LEFT JOIN vendas_itens vi ON v.venda_id = vi.venda_id
-        LEFT JOIN condicionais c ON vi.condicional_id = c.condicional_id
-        LEFT JOIN parceiros p ON v.vendedor = p.parceiro
-    WHERE
-        v.dtacomp BETWEEN :DataIniVenda AND :DataFimVenda
-        AND (v.vendedor = :Vendedor OR (:Vendedor = 0))
-        AND v.idn_cancelada = 'N'
-        AND v.tipo_nd = 'N'
-        ) a
+with pData as(
+ select
+  cast(:pData as date) data
+ from rdb$database )
 
-WHERE a.RowNum = 1
+, pMesAtual as(
+ select
+  cast(substring(p.Data from 1 for 8) || '01' as date) ini_mes,
+  dateadd(month, 1, cast(substring(p.Data from 1 for 8) || '01' as date))-1  fim_mes
+  from pData p)
 
-union all
+, parametro as (
+ select
+  p.data,
+  atu.ini_mes,
+  atu.fim_mes
+ from pData p, pMesAtual atu )
 
 SELECT
-    null as VALOR_CONDICIONAL,
-    null as Valor_venda_Total,
-    null as vendedor,
-    null as nome,
-    SUM(vd.total_venda) over(partition by vd.vendedor) as dev_venda
+    SUM(iif(v.tipo_nd = 'D', v.total_venda, 0)) as dev_venda,
+    SUM(iif(v.tipo_nd = 'N', v.total_venda, 0)) as total_venda,
+    v.vendedor,
+    pp.nome
 
-FROM
-    vendas vd
+
+FROM parametro p
+left JOIN vendas v ON v.dtacomp between p.ini_mes and p.fim_mes
+join parceiros pp on v.vendedor = pp.parceiro
 
 WHERE
-    vd.dtacomp BETWEEN :DataIniVenda AND :DataFimVenda
-    and (vd.vendedor = :Vendedor OR (:Vendedor = 0))
-    and vd.codoper = 150
-    and vd.idn_cancelada= 'N'
+    v.idn_cancelada = 'N'
+    AND (v.vendedor = :Vendedor OR (:Vendedor = 0))
+
+GROUP BY
+    v.vendedor, pp.nome
