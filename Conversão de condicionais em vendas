@@ -1,17 +1,48 @@
 SELECT
-    SUM(iif(v.tipo_nd = 'D', v.total_venda, 0)) as dev_venda,
-    SUM(iif(v.tipo_nd = 'N', v.total_venda, 0)) as total_venda,
-    SUM(iif(v.tipo_nd = 'N', v.total_venda, 0)) - SUM(iif(v.tipo_nd = 'D', v.total_venda, 0)) as total_venda_liquido,
-    v.vendedor,
-    pp.nome
+    vd.vendedor,
+    pp.nome,
+    SUM(vd.dev_venda) as dev_venda,
+    SUM(vd.total_venda) as total_venda,
+    SUM(vd.total_venda) - SUM(vd.dev_venda) as total_venda_liquido,
+    SUM(cd.vendida) as condicional_vendida,
+    SUM(cd1.entregue) as condiocional_entregue
 
-FROM vendas v
-    left join parceiros pp on v.vendedor = pp.parceiro
 
-WHERE
-    v.dtacomp between :pDataIni and :pDataFim
-    AND v.idn_cancelada = 'N'
-    AND (v.vendedor = :Vendedor OR (:Vendedor = 0))
+
+FROM
+/*select que soma vendas e devoluções de venda no período x*/
+     (SELECT
+            v.vendedor,
+            SUM(iif(v.tipo_nd = 'D', v.total_venda, 0)) as dev_venda,
+            SUM(iif(v.tipo_nd = 'N', v.total_venda, 0)) as total_venda
+        FROM vendas v
+        WHERE
+            v.dtacomp BETWEEN :pDataIni AND :pDataFim
+            AND v.idn_cancelada = 'N'
+            AND (v.vendedor = :Vendedor OR (:Vendedor = 0))
+        GROUP BY
+            v.vendedor) as vd
+/*pegar nome do vendedor*/
+    LEFT JOIN parceiros pp ON vd.vendedor = pp.parceiro
+/*select que soma as condionais por vendedor, condicionais que tiveram vendas*/
+    LEFT JOIN (SELECT
+            c.vendedor,
+            SUM(c.valor) as VENDIDA
+        FROM condicionais c
+            left join vendas_itens vdi on vdi.condicional_id = c.condicional_id
+        WHERE
+            vdi.dtacomp BETWEEN :pDataIni AND :pDataFim
+        GROUP BY
+            c.vendedor) as cd ON vd.vendedor = cd.vendedor
+/*select que soma as condionais por vendedor, entregues*/
+         LEFT JOIN (SELECT
+            c.vendedor,
+            SUM(c.valor) as ENTREGUE
+        FROM condicionais c
+        WHERE
+            c.dtacomp BETWEEN :pDataIni AND :pDataFim
+        GROUP BY
+            c.vendedor) as cd1 ON vd.vendedor = cd1.vendedor
 
 GROUP BY
-    v.vendedor, pp.nome
+    vd.vendedor, pp.nome;
