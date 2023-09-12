@@ -5,7 +5,7 @@ SELECT
     SUM(vd.total_venda) as total_venda,
     SUM(vd.total_venda) - SUM(vd.dev_venda) as total_venda_liquido,
     SUM(cd.vendida) as condicional_vendida,
-    SUM(cd1.entregue) as condiocional_entregue
+    cd1.entregue as condiocional_entregue
 
 
 
@@ -45,4 +45,4 @@ FROM
             c.vendedor) as cd1 ON vd.vendedor = cd1.vendedor
 
 GROUP BY
-    vd.vendedor, pp.nome;
+    vd.vendedor, pp.nome, condiocional_entregue;
