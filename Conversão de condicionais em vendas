@@ -5,12 +5,13 @@ SELECT
     SUM(vd.total_venda) as total_venda,
     SUM(vd.total_venda) - SUM(vd.dev_venda) as total_venda_liquido,
     SUM(cd.vendida) as condicional_vendida,
-    cd1.entregue as condiocional_entregue
-
+    cd1.entregue as condiocional_entregue,
+    cd.qtd,
+    cd1.qtd
 
 
 FROM
-/*select que soma vendas e devoluções de venda no período x*/
+
      (SELECT
             v.vendedor,
             SUM(iif(v.tipo_nd = 'D', v.total_venda, 0)) as dev_venda,
@@ -22,11 +23,12 @@ FROM
             AND (v.vendedor = :Vendedor OR (:Vendedor = 0))
         GROUP BY
             v.vendedor) as vd
-/*pegar nome do vendedor*/
+
     LEFT JOIN parceiros pp ON vd.vendedor = pp.parceiro
-/*select que soma as condionais por vendedor, condicionais que tiveram vendas*/
+
     LEFT JOIN (SELECT
             c.vendedor,
+            count(distinct c.numcondicional) as QTD,
             SUM(c.valor) as VENDIDA
         FROM condicionais c
             left join vendas_itens vdi on vdi.condicional_id = c.condicional_id
@@ -34,9 +36,10 @@ FROM
             vdi.dtacomp BETWEEN :pDataIni AND :pDataFim
         GROUP BY
             c.vendedor) as cd ON vd.vendedor = cd.vendedor
-/*select que soma as condionais por vendedor, entregues*/
+
          LEFT JOIN (SELECT
             c.vendedor,
+            count(distinct c.numcondicional) as QTD,
             SUM(c.valor) as ENTREGUE
         FROM condicionais c
         WHERE
@@ -45,4 +48,4 @@ FROM
             c.vendedor) as cd1 ON vd.vendedor = cd1.vendedor
 
 GROUP BY
-    vd.vendedor, pp.nome, condiocional_entregue;
+    vd.vendedor, pp.nome, condiocional_entregue,cd.qtd,cd1.qtd ;
