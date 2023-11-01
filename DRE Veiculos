@@ -1,0 +1,27 @@
+select
+    fp.docto as documento,
+    fp.data,
+    fp.valor,
+    fp.historico,
+    ob.cod_veiculo,
+    ov.placa,
+    d.dscdespesa as despesa,
+    d.despesas_grupo as grupo_despesa,
+    fpv.valor_rateio,
+    ov.dscveiculo
+
+from
+    faturas_pagar_rateio_veic fpv
+    left join faturas_pagar fp on fpv.faturas_pagar_id = fp.faturas_pagar_id
+    left join despesas d on fp.despesa_principal = d.despesa
+    left join os_veiculos ov on fpv.placa = ov.placa
+    /*ESSE JOIN ABAIXO CRIA CÓDIGOS PARA OS VEICULOS EM TEMPO REAL
+    E ISSO PERMITE FILTRAR OS VEICULOS POR CODIGO OU TODOSO NO WHERE*/
+    left join (select row_number() over(order by o.placa) as cod_veiculo, o.placa
+    from os_veiculos o)ob on fpv.placa = ob.placa
+
+where
+    fp.data between :DataIni and :DataFim
+    and (ob.cod_veiculo = :cod_veiculo OR :cod_veiculo = 0)
+
+order by fpv.placa, fp.data
