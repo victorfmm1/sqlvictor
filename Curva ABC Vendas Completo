@@ -1,45 +1,71 @@
-select
-d3.codproduto,
-d3.descprod,
-d3.total_prod,
-d3.qtd,
-d3.total_geral,
-d3.perc,
-d3.perc_acu,
-d3.clase,
-case
-  when d3.clase = 'A' then SUM(d3.qtd) over(partition by d3.clase = 'A')
-else ''
-end as soma_qtd_A,
-case
-  when d3.clase = 'A' then SUM(d3.total_prod) over(partition by d3.clase = 'A')
-else '' end soma_total_A,
-case
-  when d3.clase = 'B' then SUM(d3.qtd) over(partition by d3.clase = 'B')
-else ''
-end as soma_qtd_B,
-case
-  when d3.clase = 'B' then SUM(d3.total_prod) over(partition by d3.clase = 'B')
-else '' end soma_total_B,
-case
-  when d3.clase = 'C' then SUM(d3.qtd) over(partition by d3.clase = 'C')
-else ''
-end as soma_qtd_C,
-case
-  when d3.clase = 'C' then SUM(d3.total_prod) over(partition by d3.clase = 'C')
-else '' end soma_total_C,
-case
-  when d3.clase = 'A' then COUNT(d3.codproduto) over(partition by d3.clase = 'A')
-else '' end soma_itens_A,
-case
-  when d3.clase = 'B' then COUNT(d3.codproduto) over(partition by d3.clase = 'B')
-else '' end soma_itens_B,
-case
-  when d3.clase = 'C' then COUNT(d3.codproduto) over(partition by d3.clase = 'C')
-else '' end soma_itens_C
+-- Seleção final com classificação ABC e somatórios por classe
+SELECT
+    d3.codproduto,                   -- Código do produto + classe
+    d3.descprod,                     -- Descrição do produto + classe
+    d3.total_prod,                   -- Faturamento do produto
+    d3.qtd,                          -- Quantidade vendida do produto
+    d3.total_geral,                  -- Faturamento total de todos os produtos
+    d3.perc,                         -- Participação % do produto no total
+    d3.perc_acu,                     -- Participação acumulada
+    d3.clase,                        -- Classe ABC (A, B ou C)
 
-from (
-    select
+    -- Soma das QTD somente dos produtos classe A
+    CASE
+      WHEN d3.clase = 'A' THEN SUM(d3.qtd) OVER (PARTITION BY d3.clase = 'A')
+      ELSE ''
+    END AS soma_qtd_A,
+
+    -- Soma do TOTAL somente dos produtos classe A
+    CASE
+      WHEN d3.clase = 'A' THEN SUM(d3.total_prod) OVER (PARTITION BY d3.clase = 'A')
+      ELSE ''
+    END soma_total_A,
+
+    -- Classe B – quantidade
+    CASE
+      WHEN d3.clase = 'B' THEN SUM(d3.qtd) OVER (PARTITION BY d3.clase = 'B')
+      ELSE ''
+    END AS soma_qtd_B,
+
+    -- Classe B – total
+    CASE
+      WHEN d3.clase = 'B' THEN SUM(d3.total_prod) OVER (PARTITION BY d3.clase = 'B')
+      ELSE ''
+    END soma_total_B,
+
+    -- Classe C – quantidade
+    CASE
+      WHEN d3.clase = 'C' THEN SUM(d3.qtd) OVER (PARTITION BY d3.clase = 'C')
+      ELSE ''
+    END AS soma_qtd_C,
+
+    -- Classe C – total
+    CASE
+      WHEN d3.clase = 'C' THEN SUM(d3.total_prod) OVER (PARTITION BY d3.clase = 'C')
+      ELSE ''
+    END soma_total_C,
+
+    -- Contagem de itens por classe A/B/C
+    CASE
+      WHEN d3.clase = 'A' THEN COUNT(d3.codproduto) OVER (PARTITION BY d3.clase = 'A')
+      ELSE ''
+    END soma_itens_A,
+
+    CASE
+      WHEN d3.clase = 'B' THEN COUNT(d3.codproduto) OVER (PARTITION BY d3.clase = 'B')
+      ELSE ''
+    END soma_itens_B,
+
+    CASE
+      WHEN d3.clase = 'C' THEN COUNT(d3.codproduto) OVER (PARTITION BY d3.clase = 'C')
+      ELSE ''
+    END soma_itens_C
+
+
+FROM (
+
+    -- Define a classe ABC baseada no percentual acumulado
+    SELECT
         d2.codproduto,
         d2.descprod,
         d2.total_prod,
@@ -47,48 +73,75 @@ from (
         d2.total_geral,
         d2.perc,
         d2.perc_acu,
-        case
-          when d2.perc_acu <= 80 then 'A'
-          when d2.perc_acu <= 95 then 'B'
-          else 'C'
-        end as clase
-    from (
-        select
+
+        -- Regras ABC:
+        -- A = até 80%
+        -- B = entre 80% e 95%
+        -- C = acima de 95%
+        CASE
+          WHEN d2.perc_acu <= 80 THEN 'A'
+          WHEN d2.perc_acu <= 95 THEN 'B'
+          ELSE 'C'
+        END AS clase
+
+    FROM (
+
+        -- Calcula percentual acumulado
+        SELECT
            d1.codproduto,
            d1.descprod,
            d1.total_prod,
            d1.qtd,
            d1.total_geral,
            d1.perc,
-           SUM(d1.perc) over(order by d1.perc desc) as perc_acu
-        
-        from (
-            select
+
+           -- Percentual acumulado ordenado por participação
+           SUM(d1.perc) OVER (ORDER BY d1.perc DESC) AS perc_acu
+
+        FROM (
+
+            -- Calcula participação percentual de cada produto
+            SELECT
              d.codproduto,
              d.descprod,
              d.total_prod,
              d.qtd,
-             SUM(d.total_prod) over() as total_geral,
-             CAST(d.total_prod as numeric (15,3)) / CAST(SUM(d.total_prod) over() as numeric (15,3)) * 100 perc
-    
-            from (
-                select
-                    vi.codproduto || '/' || vi.codproduto_clas as codproduto,
-                    p.dscproduto || '/' || pc.dscproduto_clas as descprod,
-                    SUM(vi.total) as total_prod,
-                    SUM(vi.qtd) as qtd
-                from
+
+             -- Soma geral das vendas (denominador do percentual)
+             SUM(d.total_prod) OVER() AS total_geral,
+
+             -- Percentual do produto sobre o total
+             CAST(d.total_prod AS NUMERIC (15,3)) /
+             CAST(SUM(d.total_prod) OVER() AS NUMERIC (15,3)) * 100 AS perc
+
+            FROM (
+
+                -- Agregação base: total vendido por produto
+                SELECT
+                    vi.codproduto || '/' || vi.codproduto_clas AS codproduto,
+                    p.dscproduto || '/' || pc.dscproduto_clas AS descprod,
+                    SUM(vi.total) AS total_prod,   -- Faturamento
+                    SUM(vi.qtd) AS qtd             -- Quantidade vendida
+
+                FROM
                     vendas_itens vi
-                    left join vendas v on v.venda_id = vi.venda_id
-                    left join produtos p on vi.codproduto = p.codproduto
-                    left join produtos_clas pc on vi.codproduto = pc.codproduto and vi.codproduto_clas = pc.codproduto_clas
-                    left join filiais f on v.codfilial = f.codfilial
-    
-                where vi.dtacomp between :DataIni and :DataFim
-                AND (f.codfilial = :filial or :filial = 0)
-                AND v.idn_cancelada = 'N'
-                AND v.tipo_nd = 'N'
-    
-                group by 1,2
-                order by 3 desc) d) d1) d2)d3
-                order by d3.total_prod desc
+                    LEFT JOIN vendas v ON v.venda_id = vi.venda_id
+                    LEFT JOIN produtos p ON vi.codproduto = p.codproduto
+                    LEFT JOIN produtos_clas pc ON vi.codproduto = pc.codproduto
+                         AND vi.codproduto_clas = pc.codproduto_clas
+                    LEFT JOIN filiais f ON v.codfilial = f.codfilial
+
+                WHERE
+                    vi.dtacomp BETWEEN :DataIni AND :DataFim   -- Período
+                    AND (f.codfilial = :filial OR :filial = 0) -- Filial opcional
+                    AND v.idn_cancelada = 'N'                  -- Somente vendas válidas
+                    AND v.tipo_nd = 'N'                        -- Apenas notas normais
+
+                GROUP BY 1,2
+                ORDER BY 3 DESC
+            ) d
+        ) d1
+    ) d2
+) d3
+
+ORDER BY d3.total_prod DESC; -- Ordena do maior para o menor faturamento
