@@ -1,51 +1,63 @@
 SELECT
-    vd.vendedor,
-    pp.nome,
-    SUM(vd.dev_venda) as dev_venda,
-    SUM(vd.total_venda) as total_venda,
-    SUM(vd.total_venda) - SUM(vd.dev_venda) as total_venda_liquido,
-    SUM(cd.vendida) as condicional_vendida,
-    cd1.entregue as condiocional_entregue,
-    cd.qtd,
-    cd1.qtd
-
+    vd.vendedor,                         -- Código do vendedor
+    pp.nome,                             -- Nome do vendedor (parceiro)
+    SUM(vd.dev_venda) as dev_venda,      -- Total de devoluções no período
+    SUM(vd.total_venda) as total_venda,  -- Total de vendas no período
+    SUM(vd.total_venda) - SUM(vd.dev_venda) as total_venda_liquido, -- Venda líquida = vendas - devoluções
+    SUM(cd.vendida) as condicional_vendida,   -- Valor vendido de condicionais
+    cd1.entregue as condiocional_entregue,    -- Valor entregue de condicionais
+    cd.qtd,                                  -- Quantidade de condicionais vendidas
+    cd1.qtd                                  -- Quantidade de condicionais entregues
 
 FROM
 
-     (SELECT
+    -- Subselect principal das vendas e devoluções do período
+    (SELECT
             v.vendedor,
-            SUM(iif(v.tipo_nd = 'D', v.total_venda, 0)) as dev_venda,
-            SUM(iif(v.tipo_nd = 'N', v.total_venda, 0)) as total_venda
+            SUM(iif(v.tipo_nd = 'D', v.total_venda, 0)) as dev_venda,   -- Soma devoluções
+            SUM(iif(v.tipo_nd = 'N', v.total_venda, 0)) as total_venda  -- Soma vendas normais
         FROM vendas v
         WHERE
-            v.dtacomp BETWEEN :pDataIni AND :pDataFim
-            AND v.idn_cancelada = 'N'
-            AND (v.vendedor = :Vendedor OR (:Vendedor = 0))
+            v.dtacomp BETWEEN :pDataIni AND :pDataFim    -- Filtro por data
+            AND v.idn_cancelada = 'N'                    -- Apenas notas não canceladas
+            AND (v.vendedor = :Vendedor OR (:Vendedor = 0))  -- Filtra por vendedor, se informado
         GROUP BY
             v.vendedor) as vd
 
+    -- Relaciona com tabela de parceiros para trazer nome do vendedor
     LEFT JOIN parceiros pp ON vd.vendedor = pp.parceiro
 
-    LEFT JOIN (SELECT
+    -- Subselect das condicionais vendidas
+    LEFT JOIN (
+        SELECT
             c.vendedor,
-            count(distinct c.numcondicional) as QTD,
-            SUM(c.valor) as VENDIDA
+            COUNT(DISTINCT c.numcondicional) as QTD,    -- Quantidade de condicionais diferentes
+            SUM(c.valor) as VENDIDA                     -- Soma do valor vendido
         FROM condicionais c
-            left join vendas_itens vdi on vdi.condicional_id = c.condicional_id
+            LEFT JOIN vendas_itens vdi ON vdi.condicional_id = c.condicional_id
         WHERE
-            vdi.dtacomp BETWEEN :pDataIni AND :pDataFim
+            vdi.dtacomp BETWEEN :pDataIni AND :pDataFim  -- Data baseada no item de venda
         GROUP BY
-            c.vendedor) as cd ON vd.vendedor = cd.vendedor
+            c.vendedor) as cd
+        ON vd.vendedor = cd.vendedor
 
-         LEFT JOIN (SELECT
+    -- Subselect das condicionais entregues no período
+    LEFT JOIN (
+        SELECT
             c.vendedor,
-            count(distinct c.numcondicional) as QTD,
-            SUM(c.valor) as ENTREGUE
+            COUNT(DISTINCT c.numcondicional) as QTD,   -- Quantidade de condicionais entregues
+            SUM(c.valor) as ENTREGUE                   -- Valor total entregue
         FROM condicionais c
         WHERE
-            c.dtacomp BETWEEN :pDataIni AND :pDataFim
+            c.dtacomp BETWEEN :pDataIni AND :pDataFim  -- Data da condicional
         GROUP BY
-            c.vendedor) as cd1 ON vd.vendedor = cd1.vendedor
+            c.vendedor) as cd1
+        ON vd.vendedor = cd1.vendedor
 
+-- Agregação final dos resultados
 GROUP BY
-    vd.vendedor, pp.nome, condiocional_entregue,cd.qtd,cd1.qtd ;
+    vd.vendedor,
+    pp.nome,
+    condiocional_entregue,
+    cd.qtd,
+    cd1.qtd;
